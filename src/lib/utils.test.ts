@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseGenres, posterUrl, pageCount, offsetFor, clampPage } from './utils';
+import { parseGenres, posterUrl, pageCount, offsetFor } from './utils';
 
 describe('parseGenres', () => {
   it('splits a comma string and trims', () => {
@@ -37,11 +37,5 @@ describe('pagination math', () => {
     expect(offsetFor(1, 24)).toBe(0);
     expect(offsetFor(3, 24)).toBe(48);
     expect(offsetFor(0, 24)).toBe(0);
-  });
-  it('clampPage keeps page within [1, pages]', () => {
-    expect(clampPage(0, 100, 24)).toBe(1);
-    expect(clampPage(99, 100, 24)).toBe(5);
-    expect(clampPage(NaN, 100, 24)).toBe(1);
-    expect(clampPage(2, 100, 24)).toBe(2);
   });
 });

@@ -21,9 +21,3 @@ export function pageCount(total: number, limit: number): number {
 export function offsetFor(page: number, limit: number): number {
   return Math.max(0, (page - 1) * limit);
 }
-
-export function clampPage(page: number, total: number, limit: number): number {
-  const pages = pageCount(total, limit);
-  if (!Number.isFinite(page) || page < 1) return 1;
-  return Math.min(Math.floor(page), pages);
-}

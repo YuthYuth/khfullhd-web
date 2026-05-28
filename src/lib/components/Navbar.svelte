@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/state';
-  let q = $state(page.url.searchParams.get('q') ?? '');
 </script>
 
 <header class="sticky top-0 z-50 border-b border-surface-2 bg-bg/80 backdrop-blur">
@@ -10,11 +9,12 @@
     <form action="/search" class="ml-auto">
       <input
         name="q"
-        bind:value={q}
+        value={page.url.searchParams.get('q') ?? ''}
         placeholder="Search movies & series…"
         minlength="2"
         class="w-44 rounded-full bg-surface-2 px-4 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent sm:w-64"
       />
+      <button type="submit" class="sr-only">Search</button>
     </form>
   </nav>
 </header>

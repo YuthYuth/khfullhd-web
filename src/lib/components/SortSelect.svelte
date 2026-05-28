@@ -1,7 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  let { sort }: { sort: string } = $props();
+  import type { SortKey } from '$lib/types';
+  let { sort }: { sort: SortKey } = $props();
 
   const options = [
     { value: 'release_year_desc', label: 'Newest' },

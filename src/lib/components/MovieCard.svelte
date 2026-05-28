@@ -4,7 +4,7 @@
   import PosterPlaceholder from './PosterPlaceholder.svelte';
 
   let { movie }: { movie: Movie } = $props();
-  const poster = posterUrl(movie.poster_url);
+  const poster = $derived(posterUrl(movie.poster_url));
 </script>
 
 <a href="/movies/{movie.movie_id}" class="group block">

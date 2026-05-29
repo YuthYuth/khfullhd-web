@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { listMovies, getMovie, searchMovies } from './api';
+import { listMovies, getMovie, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -66,5 +66,29 @@ describe('optional auth token seam', () => {
     const fetch = vi.fn().mockResolvedValue(jsonResponse({ total: 0, limit: 24, offset: 0, items: [] }));
     await listMovies(fetch, {}, 'tok123');
     expect(fetch.mock.calls[0][1]).toEqual({ headers: { Authorization: 'Bearer tok123' } });
+  });
+});
+
+describe('favorites client', () => {
+  it('listFavoriteIds GETs with a bearer token and returns the ids', async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse([1, 2, 3]));
+    const ids = await listFavoriteIds(fetch, 'tok');
+    expect(ids).toEqual([1, 2, 3]);
+    expect(fetch.mock.calls[0][0]).toContain('/favorites/ids');
+    expect(fetch.mock.calls[0][1]).toMatchObject({ headers: { Authorization: 'Bearer tok' } });
+  });
+
+  it('addFavorite POSTs to /favorites/{id} with a bearer token', async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ favorited: true }));
+    await addFavorite(fetch, 7, 'tok');
+    expect(fetch.mock.calls[0][0]).toContain('/favorites/7');
+    expect(fetch.mock.calls[0][1]).toMatchObject({ method: 'POST', headers: { Authorization: 'Bearer tok' } });
+  });
+
+  it('removeFavorite DELETEs /favorites/{id} with a bearer token', async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    await removeFavorite(fetch, 7, 'tok');
+    expect(fetch.mock.calls[0][0]).toContain('/favorites/7');
+    expect(fetch.mock.calls[0][1]).toMatchObject({ method: 'DELETE', headers: { Authorization: 'Bearer tok' } });
   });
 });

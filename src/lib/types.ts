@@ -27,3 +27,7 @@ export interface SearchResult {
 export type SortKey = 'release_year_desc' | 'release_year_asc' | 'rating_desc' | 'title_asc';
 
 export const SORT_KEYS: SortKey[] = ['release_year_desc', 'release_year_asc', 'rating_desc', 'title_asc'];
+
+export interface FavoritesOut {
+  items: Movie[];
+}

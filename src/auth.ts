@@ -10,14 +10,17 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
       issuer: env.AUTH_AUTHENTIK_ISSUER,
       clientSecret: '',
       client: { token_endpoint_auth_method: 'none' },
-      checks: ['pkce', 'state']
+      checks: ['pkce', 'state'],
+      authorization: { params: { scope: 'openid email profile offline_access' } }
     })
   ],
   trustHost: true,
   callbacks: {
     async jwt({ token, account }) {
-      if (account?.access_token) {
+      if (account) {
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.expiresAt = account.expires_at; // epoch seconds, set by Auth.js
       }
       return token;
     }

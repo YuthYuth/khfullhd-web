@@ -1,8 +1,18 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
 import Authentik from '@auth/sveltekit/providers/authentik';
+import { env } from '$env/dynamic/private';
 
 export const { handle, signIn, signOut } = SvelteKitAuth({
-  providers: [Authentik],
+  providers: [
+    // Reuses the khfullhd-api Authentik app, which is a PUBLIC client (PKCE, no secret).
+    Authentik({
+      clientId: env.AUTH_AUTHENTIK_ID,
+      issuer: env.AUTH_AUTHENTIK_ISSUER,
+      clientSecret: '',
+      client: { token_endpoint_auth_method: 'none' },
+      checks: ['pkce', 'state']
+    })
+  ],
   trustHost: true,
   callbacks: {
     async jwt({ token, account }) {

@@ -31,7 +31,13 @@ export async function getAccessToken(event: RequestEvent): Promise<string | unde
     return token.accessToken; // cannot refresh — best effort
   }
 
-  const tokenUrl = new URL('../token/', env.AUTH_AUTHENTIK_ISSUER).toString();
+  // Authentik's token endpoint is GLOBAL (/application/o/token/), not per-app — the
+  // issuer is /application/o/<slug>/, so go up one segment. (Verified via the issuer's
+  // .well-known/openid-configuration token_endpoint.)
+  const issuer = env.AUTH_AUTHENTIK_ISSUER.endsWith('/')
+    ? env.AUTH_AUTHENTIK_ISSUER
+    : env.AUTH_AUTHENTIK_ISSUER + '/';
+  const tokenUrl = new URL('../token/', issuer).toString();
   let data: { access_token?: string; refresh_token?: string; expires_in?: number };
   try {
     const resp = await fetch(tokenUrl, {

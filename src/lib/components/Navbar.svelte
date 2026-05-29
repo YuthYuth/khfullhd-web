@@ -1,5 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { signIn, signOut } from '@auth/sveltekit/client';
+  import { userLabel, type SessionUser } from '$lib/user';
+  let { user = null }: { user?: SessionUser | null } = $props();
+  const label = $derived(userLabel(user));
 </script>
 
 <header class="sticky top-0 z-50 border-b border-surface-2 bg-bg/80 backdrop-blur">
@@ -16,5 +20,13 @@
       />
       <button type="submit" class="sr-only">Search</button>
     </form>
+    <div class="flex items-center gap-3">
+      {#if label}
+        <span class="hidden text-sm text-muted sm:inline">{label}</span>
+        <button onclick={() => signOut()} class="rounded-full bg-surface-2 px-4 py-2 text-sm text-text hover:bg-surface">Sign out</button>
+      {:else}
+        <button onclick={() => signIn('authentik')} class="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white">Sign in</button>
+      {/if}
+    </div>
   </nav>
 </header>

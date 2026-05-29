@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { getMovie, listFavoriteIds, addFavorite, removeFavorite } from '$lib/server/api';
+import { getAccessToken } from '$lib/server/session';
 
 function movieId(raw: string): number {
   const id = Number(raw);
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async (event) => {
   const id = movieId(event.params.id);
   const movie = await getMovie(event.fetch, id);
   const session = await event.locals.auth();
-  const token = session?.accessToken;
+  const token = await getAccessToken(event);
   let favorited = false;
   if (token) {
     const ids = await listFavoriteIds(event.fetch, token);
@@ -25,15 +26,13 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
   favorite: async (event) => {
-    const session = await event.locals.auth();
-    const token = session?.accessToken;
+    const token = await getAccessToken(event);
     if (!token) error(401, 'Sign in to save favorites');
     await addFavorite(event.fetch, movieId(event.params.id), token);
     return { favorited: true };
   },
   unfavorite: async (event) => {
-    const session = await event.locals.auth();
-    const token = session?.accessToken;
+    const token = await getAccessToken(event);
     if (!token) error(401, 'Sign in to save favorites');
     await removeFavorite(event.fetch, movieId(event.params.id), token);
     return { favorited: false };

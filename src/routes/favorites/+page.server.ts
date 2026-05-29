@@ -1,10 +1,10 @@
 import type { Actions, PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { listFavorites, removeFavorite } from '$lib/server/api';
+import { getAccessToken } from '$lib/server/session';
 
 export const load: PageServerLoad = async (event) => {
-  const session = await event.locals.auth();
-  const token = session?.accessToken;
+  const token = await getAccessToken(event);
   if (!token) {
     redirect(303, '/');
   }
@@ -14,8 +14,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
   unfavorite: async (event) => {
-    const session = await event.locals.auth();
-    const token = session?.accessToken;
+    const token = await getAccessToken(event);
     if (!token) {
       redirect(303, '/');
     }

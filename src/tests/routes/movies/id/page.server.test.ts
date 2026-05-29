@@ -1,4 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('$lib/server/session', () => ({ getAccessToken: vi.fn() }));
+import { getAccessToken } from '$lib/server/session';
 import { load } from '../../../../routes/movies/[id]/+page.server';
 import type { Movie } from '$lib/types';
 
@@ -12,6 +15,11 @@ function event(id: string, fetch: ReturnType<typeof vi.fn>, auth: () => Promise<
 type LoadResult = { movie: Movie };
 
 describe('detail load', () => {
+  beforeEach(() => {
+    (getAccessToken as any).mockReset();
+    (getAccessToken as any).mockResolvedValue(undefined);
+  });
+
   it('throws 404 for a non-numeric id without calling the API', async () => {
     const fetch = vi.fn();
     await expect(load(event('abc', fetch))).rejects.toMatchObject({ status: 404 });
@@ -30,11 +38,12 @@ describe('detail load', () => {
   });
 
   it('marks favorited when the movie id is in the user favorites', async () => {
+    (getAccessToken as any).mockResolvedValue('tok');
     const fetch = vi
       .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ movie_id: 7, title: 'Z' }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify([7, 9]), { status: 200 }));
-    const result: any = await load(event('7', fetch, async () => ({ user: { name: 'A' }, accessToken: 'tok' })));
+    const result: any = await load(event('7', fetch, async () => ({ user: { name: 'A' } })));
     expect(result.signedIn).toBe(true);
     expect(result.favorited).toBe(true);
   });

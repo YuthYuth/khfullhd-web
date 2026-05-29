@@ -16,19 +16,10 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
   trustHost: true,
   callbacks: {
     async jwt({ token, account }) {
-      // Dormant seam for v3: keep the access token server-side (encrypted JWT).
-      // NOT exposed to the client session and NOT forwarded to the API in v2.
       if (account?.access_token) {
         token.accessToken = account.access_token;
       }
       return token;
-    },
-    async session({ session, token }) {
-      // Server-side only — stripped before reaching the browser (see +layout.server.ts).
-      if (token.accessToken) {
-        (session as { accessToken?: string }).accessToken = token.accessToken as string;
-      }
-      return session;
     }
   }
 });

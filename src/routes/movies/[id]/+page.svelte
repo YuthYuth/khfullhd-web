@@ -34,6 +34,16 @@
         {#if m.imdb_rating}<span class="rounded bg-rating px-1.5 py-0.5 font-bold text-black">★ {m.imdb_rating}</span>{/if}
       </div>
 
+      {#if data.signedIn}
+        <form method="POST" action={data.favorited ? '?/unfavorite' : '?/favorite'} class="mt-4">
+          <button class="rounded-full border border-surface-2 px-4 py-2 text-sm hover:border-accent">
+            {data.favorited ? '♥ Saved' : '♡ Save'}
+          </button>
+        </form>
+      {:else}
+        <p class="mt-4 text-sm text-muted">Sign in to save this movie.</p>
+      {/if}
+
       {#if genres.length}
         <div class="mt-4 flex flex-wrap gap-2">
           {#each genres as g (g)}<span class="rounded-full bg-surface-2 px-3 py-1 text-xs">{g}</span>{/each}

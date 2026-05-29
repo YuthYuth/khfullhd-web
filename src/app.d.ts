@@ -11,3 +11,9 @@ declare global {
 }
 
 export {};
+
+declare module '@auth/sveltekit' {
+  interface Session {
+    accessToken?: string;
+  }
+}

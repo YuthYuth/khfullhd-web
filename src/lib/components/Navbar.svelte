@@ -22,6 +22,7 @@
     </form>
     <div class="flex items-center gap-3">
       {#if label}
+        <a href="/favorites" class="text-sm text-muted hover:text-text">Favorites</a>
         <span class="hidden text-sm text-muted sm:inline">{label}</span>
         <button onclick={() => signOut()} class="rounded-full bg-surface-2 px-4 py-2 text-sm text-text hover:bg-surface">Sign out</button>
       {:else}

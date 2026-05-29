@@ -9,7 +9,7 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 <div class="flex min-h-screen flex-col bg-bg text-text">
-  <Navbar user={data.session?.user} />
+  <Navbar user={data.user} />
   <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-6">{@render children()}</main>
   <Footer />
 </div>

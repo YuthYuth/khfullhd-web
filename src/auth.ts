@@ -22,6 +22,13 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
         token.accessToken = account.access_token;
       }
       return token;
+    },
+    async session({ session, token }) {
+      // Server-side only — stripped before reaching the browser (see +layout.server.ts).
+      if (token.accessToken) {
+        (session as { accessToken?: string }).accessToken = token.accessToken as string;
+      }
+      return session;
     }
   }
 });

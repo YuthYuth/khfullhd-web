@@ -24,3 +24,9 @@ test('unknown movie id renders the error page', async ({ page }) => {
   await page.goto('/movies/99999999');
   await expect(page.getByText('404')).toBeVisible();
 });
+
+test('signed-out navbar shows Sign in and catalog still renders', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  await expect(page.getByText('Top rated')).toBeVisible();
+});

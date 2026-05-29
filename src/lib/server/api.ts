@@ -8,10 +8,11 @@ function apiBase(): string {
   return env.KHFULLHD_API_URL || 'http://127.0.0.1:8000';
 }
 
-async function getJson<T>(fetch: Fetcher, path: string): Promise<T> {
+async function getJson<T>(fetch: Fetcher, path: string, token?: string): Promise<T> {
+  const init = token ? { headers: { Authorization: `Bearer ${token}` } } : undefined;
   let res: Response;
   try {
-    res = await fetch(apiBase() + path);
+    res = await fetch(apiBase() + path, init);
   } catch {
     throw error(503, 'Catalog temporarily unavailable');
   }
@@ -29,20 +30,20 @@ export interface ListParams {
   sort?: SortKey;
 }
 
-export function listMovies(fetch: Fetcher, params: ListParams): Promise<MovieList> {
+export function listMovies(fetch: Fetcher, params: ListParams, token?: string): Promise<MovieList> {
   const qs = new URLSearchParams({
     limit: String(params.limit ?? 24),
     offset: String(params.offset ?? 0),
     sort: params.sort ?? 'release_year_desc'
   });
-  return getJson<MovieList>(fetch, `/movies?${qs}`);
+  return getJson<MovieList>(fetch, `/movies?${qs}`, token);
 }
 
-export function getMovie(fetch: Fetcher, id: number): Promise<Movie> {
-  return getJson<Movie>(fetch, `/movies/${id}`);
+export function getMovie(fetch: Fetcher, id: number, token?: string): Promise<Movie> {
+  return getJson<Movie>(fetch, `/movies/${id}`, token);
 }
 
-export function searchMovies(fetch: Fetcher, q: string, limit = 24): Promise<SearchResult> {
+export function searchMovies(fetch: Fetcher, q: string, limit = 24, token?: string): Promise<SearchResult> {
   const qs = new URLSearchParams({ q, limit: String(limit) });
-  return getJson<SearchResult>(fetch, `/search?${qs}`);
+  return getJson<SearchResult>(fetch, `/search?${qs}`, token);
 }

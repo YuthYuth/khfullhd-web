@@ -54,3 +54,17 @@ describe('network failure', () => {
     await expect(listMovies(fetch, {})).rejects.toMatchObject({ status: 503 });
   });
 });
+
+describe('optional auth token seam', () => {
+  it('omits the Authorization header when no token is given', async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ total: 0, limit: 24, offset: 0, items: [] }));
+    await listMovies(fetch, {});
+    expect(fetch.mock.calls[0][1]).toBeUndefined();
+  });
+
+  it('attaches a Bearer header when a token is given', async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ total: 0, limit: 24, offset: 0, items: [] }));
+    await listMovies(fetch, {}, 'tok123');
+    expect(fetch.mock.calls[0][1]).toEqual({ headers: { Authorization: 'Bearer tok123' } });
+  });
+});

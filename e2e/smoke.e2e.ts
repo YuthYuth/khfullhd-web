@@ -30,3 +30,8 @@ test('signed-out navbar shows Sign in and catalog still renders', async ({ page 
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
   await expect(page.getByText('Top rated')).toBeVisible();
 });
+
+test('signed-out /favorites redirects to home', async ({ page }) => {
+  await page.goto('/favorites');
+  await expect(page).toHaveURL('http://localhost:4173/');
+});

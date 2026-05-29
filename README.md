@@ -44,6 +44,10 @@ AUTH_AUTHENTIK_ISSUER=http://localhost:9000/application/o/khfullhd-web/
 
 The API must be running; it now allows anonymous reads, so public browse works whether or not you're signed in.
 
+## Favorites (v3)
+
+Signed-in users can save movies (heart toggle on a movie's detail page) and view them at `/favorites`. Favorites are stored in a separate writable SQLite DB on the API (`KHFULLHD_APP_DB_PATH`, default `app.db`) keyed by the user's OIDC `sub`; the scraper DB stays read-only. The web app forwards the signed-in user's access token to the `require_token`-gated `/favorites*` endpoints — the token stays server-side and never reaches the browser.
+
 ## Architecture
 
 SvelteKit talks to FastAPI **server-side** via `src/lib/server/api.ts` from each

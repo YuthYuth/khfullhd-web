@@ -20,6 +20,6 @@
   }
 </script>
 
-<select value={sort} onchange={onChange} class="rounded bg-surface-2 px-3 py-2 text-sm text-text">
+<select value={sort} onchange={onChange} class="min-h-11 rounded bg-surface-2 px-3 py-2 text-sm text-text">
   {#each options as o (o.value)}<option value={o.value}>{o.label}</option>{/each}
 </select>

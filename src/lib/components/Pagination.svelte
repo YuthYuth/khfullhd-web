@@ -13,10 +13,10 @@
 
 <nav class="mt-8 flex items-center justify-center gap-4 text-sm">
   {#if current > 1}
-    <a href={href(current - 1)} class="rounded bg-surface-2 px-3 py-2 hover:bg-surface">← Prev</a>
+    <a href={href(current - 1)} class="flex min-h-11 items-center rounded bg-surface-2 px-4 hover:bg-surface">← Prev</a>
   {/if}
   <span class="text-muted">Page {current} of {pages}</span>
   {#if current < pages}
-    <a href={href(current + 1)} class="rounded bg-surface-2 px-3 py-2 hover:bg-surface">Next →</a>
+    <a href={href(current + 1)} class="flex min-h-11 items-center rounded bg-surface-2 px-4 hover:bg-surface">Next →</a>
   {/if}
 </nav>

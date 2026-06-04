@@ -8,7 +8,7 @@
 </script>
 
 <a href="/movies/{movie.movie_id}" class="group block">
-  <div class="relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105">
+  <div class="poster relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 active:scale-95">
     {#if poster}
       <img src={poster} alt={movie.title ?? 'Untitled'} class="aspect-[2/3] w-full object-cover" loading="lazy" />
     {:else}
@@ -25,3 +25,12 @@
     {#if movie.release_year}<p class="text-xs text-muted">{movie.release_year}</p>{/if}
   </div>
 </a>
+
+<style>
+  /* Only scale on devices that truly hover — avoids sticky-hover after tap on touch. */
+  @media (hover: hover) {
+    .group:hover .poster {
+      transform: scale(1.05);
+    }
+  }
+</style>

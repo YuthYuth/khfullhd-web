@@ -36,7 +36,7 @@
 
       {#if data.signedIn}
         <form method="POST" action={data.favorited ? '?/unfavorite' : '?/favorite'} class="mt-4">
-          <button class="rounded-full border border-surface-2 px-4 py-2 text-sm hover:border-accent">
+          <button class="inline-flex min-h-11 items-center rounded-full border border-surface-2 px-5 text-sm hover:border-accent">
             {data.favorited ? '♥ Saved' : '♡ Save'}
           </button>
         </form>

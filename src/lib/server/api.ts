@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import type { Movie, MovieList, SearchResult, SortKey, FavoritesOut, RelatedOut } from '$lib/types';
+import type { Movie, MovieList, SearchResult, SortKey, FavoritesOut, RelatedOut, CommentItem, CommentsOut } from '$lib/types';
 
 export type Fetcher = typeof globalThis.fetch;
 
@@ -46,6 +46,32 @@ export function getMovie(fetch: Fetcher, id: number, token?: string): Promise<Mo
 export function getRelated(fetch: Fetcher, id: number, limit = 12, token?: string): Promise<RelatedOut> {
   const qs = new URLSearchParams({ limit: String(limit) });
   return getJson<RelatedOut>(fetch, `/movies/${id}/related?${qs}`, token);
+}
+
+export function getComments(fetch: Fetcher, id: number, limit = 50, token?: string): Promise<CommentsOut> {
+  const qs = new URLSearchParams({ limit: String(limit) });
+  return getJson<CommentsOut>(fetch, `/movies/${id}/comments?${qs}`, token);
+}
+
+export async function postComment(fetch: Fetcher, id: number, text: string, token: string): Promise<CommentItem> {
+  let res: Response;
+  try {
+    res = await fetch(apiBase() + `/movies/${id}/comments`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+  } catch {
+    throw error(503, 'Catalog temporarily unavailable');
+  }
+  if (!res.ok) {
+    if (res.status === 401) throw error(401, 'Sign in required');
+    if (res.status === 404) throw error(404, 'Not found');
+    if (res.status === 422) throw error(422, 'Comment must be 1-1000 characters');
+    if (res.status === 503) throw error(503, 'Comments are temporarily unavailable');
+    throw error(502, 'Unexpected response from the catalog API');
+  }
+  return (await res.json()) as CommentItem;
 }
 
 export function searchMovies(fetch: Fetcher, q: string, limit = 24, token?: string): Promise<SearchResult> {

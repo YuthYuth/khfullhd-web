@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { listMovies, getMovie, getRelated, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
+import { listMovies, getMovie, getRelated, getComments, postComment, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -102,5 +102,32 @@ describe('getRelated', () => {
     const calledUrl = fetch.mock.calls[0][0] as string;
     expect(calledUrl).toContain('/movies/5/related');
     expect(calledUrl).toContain('limit=12');
+  });
+});
+
+describe('comments client', () => {
+  it('getComments builds the URL and returns items', async () => {
+    const payload = { items: [{ id: 1, movie_id: 5, author_name: 'Yuth', text: 'nice', created_at: '2026-06-10' }] };
+    const fetch = vi.fn().mockResolvedValue(jsonResponse(payload));
+    const result = await getComments(fetch, 5);
+    expect(result).toEqual(payload);
+    expect(fetch.mock.calls[0][0]).toContain('/movies/5/comments');
+  });
+
+  it('postComment sends JSON body with bearer token', async () => {
+    const created = { id: 2, movie_id: 5, author_name: 'Yuth', text: 'hello', created_at: '2026-06-10' };
+    const fetch = vi.fn().mockResolvedValue(jsonResponse(created, 201));
+    const result = await postComment(fetch, 5, 'hello', 'tok-123');
+    expect(result).toEqual(created);
+    const [url, init] = fetch.mock.calls[0];
+    expect(url).toContain('/movies/5/comments');
+    expect(init.method).toBe('POST');
+    expect(init.headers.Authorization).toBe('Bearer tok-123');
+    expect(JSON.parse(init.body)).toEqual({ text: 'hello' });
+  });
+
+  it('postComment maps 401 to a sign-in error', async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ detail: 'missing bearer token' }, 401));
+    await expect(postComment(fetch, 5, 'x', 'bad')).rejects.toMatchObject({ status: 401 });
   });
 });

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import { posterUrl, parseGenres } from '$lib/utils';
   import PosterPlaceholder from '$lib/components/PosterPlaceholder.svelte';
   import PosterRow from '$lib/components/PosterRow.svelte';
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData; form: ActionData } = $props();
   const m = $derived(data.movie);
   const poster = $derived(posterUrl(m.poster_url, 'w500'));
   const backdrop = $derived(posterUrl(m.poster_url, 'w780'));
@@ -65,4 +65,45 @@
   {#if data.related.length}
     <PosterRow title="You might like" movies={data.related} />
   {/if}
+
+  <section class="mb-10 max-w-2xl">
+    <h2 class="mb-4 text-xl font-bold text-text">Comments ({data.comments.length})</h2>
+
+    {#if data.signedIn}
+      <form method="POST" action="?/comment" class="mb-6">
+        <textarea
+          name="text"
+          rows="3"
+          maxlength="1000"
+          required
+          placeholder="Share your thoughts about this movie…"
+          class="w-full rounded-xl border border-surface-2 bg-surface p-3 text-sm text-text placeholder:text-muted focus:border-accent focus:outline-none"
+        ></textarea>
+        {#if form?.commentError}
+          <p class="mt-1 text-sm text-accent">{form.commentError}</p>
+        {/if}
+        <button class="mt-2 inline-flex min-h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-white hover:opacity-90">
+          Post comment
+        </button>
+      </form>
+    {:else}
+      <p class="mb-6 text-sm text-muted">Sign in to join the discussion.</p>
+    {/if}
+
+    {#if data.comments.length}
+      <ul class="flex flex-col gap-3">
+        {#each data.comments as c (c.id)}
+          <li class="rounded-xl border border-surface-2 bg-surface p-4">
+            <div class="mb-1 flex items-baseline gap-2 text-xs text-muted">
+              <span class="font-semibold text-text">{c.author_name ?? 'Anonymous'}</span>
+              {#if c.created_at}<span>{c.created_at.slice(0, 10)}</span>{/if}
+            </div>
+            <p class="text-sm leading-relaxed text-text/90">{c.text}</p>
+          </li>
+        {/each}
+      </ul>
+    {:else}
+      <p class="text-sm text-muted">No comments yet — be the first.</p>
+    {/if}
+  </section>
 </div>

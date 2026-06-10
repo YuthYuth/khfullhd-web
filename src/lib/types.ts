@@ -32,6 +32,18 @@ export interface RelatedOut {
   items: Movie[];
 }
 
+export interface CommentItem {
+  id: number;
+  movie_id: number;
+  author_name: string | null;
+  text: string;
+  created_at: string | null;
+}
+
+export interface CommentsOut {
+  items: CommentItem[];
+}
+
 export interface FavoritesOut {
   items: Movie[];
 }

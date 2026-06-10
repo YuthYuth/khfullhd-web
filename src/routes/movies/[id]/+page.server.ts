@@ -1,7 +1,8 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import { getMovie, getRelated, listFavoriteIds, addFavorite, removeFavorite } from '$lib/server/api';
-import type { Movie } from '$lib/types';
+import { fail } from '@sveltejs/kit';
+import { getComments, getMovie, getRelated, listFavoriteIds, postComment, addFavorite, removeFavorite } from '$lib/server/api';
+import type { CommentItem, Movie } from '$lib/types';
 import { getAccessToken } from '$lib/server/session';
 
 function movieId(raw: string): number {
@@ -34,7 +35,14 @@ export const load: PageServerLoad = async (event) => {
   } catch {
     related = [];
   }
-  return { movie, signedIn: !!session?.user, favorited, related };
+  // comments too: sqlite fallback (or an API hiccup) just means an empty list
+  let comments: CommentItem[] = [];
+  try {
+    comments = (await getComments(event.fetch, id)).items;
+  } catch {
+    comments = [];
+  }
+  return { movie, signedIn: !!session?.user, favorited, related, comments };
 };
 
 export const actions: Actions = {
@@ -49,5 +57,16 @@ export const actions: Actions = {
     if (!token) error(401, 'Sign in to save favorites');
     await removeFavorite(event.fetch, movieId(event.params.id), token);
     return { favorited: false };
+  },
+  comment: async (event) => {
+    const token = await getAccessToken(event);
+    if (!token) error(401, 'Sign in to comment');
+    const form = await event.request.formData();
+    const text = String(form.get('text') ?? '').trim();
+    if (!text || text.length > 1000) {
+      return fail(422, { commentError: 'Comment must be 1-1000 characters.' });
+    }
+    await postComment(event.fetch, movieId(event.params.id), text, token);
+    return { commented: true };
   }
 };

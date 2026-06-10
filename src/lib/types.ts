@@ -28,6 +28,10 @@ export type SortKey = 'release_year_desc' | 'release_year_asc' | 'rating_desc' |
 
 export const SORT_KEYS: SortKey[] = ['release_year_desc', 'release_year_asc', 'rating_desc', 'title_asc'];
 
+export interface RelatedOut {
+  items: Movie[];
+}
+
 export interface FavoritesOut {
   items: Movie[];
 }

@@ -2,6 +2,7 @@
   import type { PageData } from './$types';
   import { posterUrl, parseGenres } from '$lib/utils';
   import PosterPlaceholder from '$lib/components/PosterPlaceholder.svelte';
+  import PosterRow from '$lib/components/PosterRow.svelte';
   let { data }: { data: PageData } = $props();
   const m = $derived(data.movie);
   const poster = $derived(posterUrl(m.poster_url, 'w500'));
@@ -60,4 +61,8 @@
       {/if}
     </div>
   </div>
+
+  {#if data.related.length}
+    <PosterRow title="You might like" movies={data.related} />
+  {/if}
 </div>

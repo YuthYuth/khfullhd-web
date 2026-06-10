@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import type { Movie, MovieList, SearchResult, SortKey, FavoritesOut } from '$lib/types';
+import type { Movie, MovieList, SearchResult, SortKey, FavoritesOut, RelatedOut } from '$lib/types';
 
 export type Fetcher = typeof globalThis.fetch;
 
@@ -41,6 +41,11 @@ export function listMovies(fetch: Fetcher, params: ListParams, token?: string): 
 
 export function getMovie(fetch: Fetcher, id: number, token?: string): Promise<Movie> {
   return getJson<Movie>(fetch, `/movies/${id}`, token);
+}
+
+export function getRelated(fetch: Fetcher, id: number, limit = 12, token?: string): Promise<RelatedOut> {
+  const qs = new URLSearchParams({ limit: String(limit) });
+  return getJson<RelatedOut>(fetch, `/movies/${id}/related?${qs}`, token);
 }
 
 export function searchMovies(fetch: Fetcher, q: string, limit = 24, token?: string): Promise<SearchResult> {

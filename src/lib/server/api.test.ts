@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { listMovies, getMovie, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
+import { listMovies, getMovie, getRelated, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -90,5 +90,17 @@ describe('favorites client', () => {
     await removeFavorite(fetch, 7, 'tok');
     expect(fetch.mock.calls[0][0]).toContain('/favorites/7');
     expect(fetch.mock.calls[0][1]).toMatchObject({ method: 'DELETE', headers: { Authorization: 'Bearer tok' } });
+  });
+});
+
+describe('getRelated', () => {
+  it('builds the /movies/{id}/related query and returns the items', async () => {
+    const payload = { items: [{ movie_id: 7, title: 'Z' }] };
+    const fetch = vi.fn().mockResolvedValue(jsonResponse(payload));
+    const result = await getRelated(fetch, 5, 12);
+    expect(result).toEqual(payload);
+    const calledUrl = fetch.mock.calls[0][0] as string;
+    expect(calledUrl).toContain('/movies/5/related');
+    expect(calledUrl).toContain('limit=12');
   });
 });

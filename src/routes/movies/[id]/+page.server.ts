@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import { getMovie, listFavoriteIds, addFavorite, removeFavorite } from '$lib/server/api';
+import { getMovie, getRelated, listFavoriteIds, addFavorite, removeFavorite } from '$lib/server/api';
+import type { Movie } from '$lib/types';
 import { getAccessToken } from '$lib/server/session';
 
 function movieId(raw: string): number {
@@ -21,7 +22,14 @@ export const load: PageServerLoad = async (event) => {
     const ids = await listFavoriteIds(event.fetch, token);
     favorited = ids.includes(id);
   }
-  return { movie, signedIn: !!session?.user, favorited };
+  // recommendations are additive: if they fail, the detail page still renders
+  let related: Movie[] = [];
+  try {
+    related = (await getRelated(event.fetch, id)).items;
+  } catch {
+    related = [];
+  }
+  return { movie, signedIn: !!session?.user, favorited, related };
 };
 
 export const actions: Actions = {

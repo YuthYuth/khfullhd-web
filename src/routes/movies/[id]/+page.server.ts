@@ -17,10 +17,15 @@ export const load: PageServerLoad = async (event) => {
   const movie = await getMovie(event.fetch, id);
   const session = await event.locals.auth();
   const token = await getAccessToken(event);
+  // favorites are additive: a stale/expired token must not 502 the movie page
   let favorited = false;
   if (token) {
-    const ids = await listFavoriteIds(event.fetch, token);
-    favorited = ids.includes(id);
+    try {
+      const ids = await listFavoriteIds(event.fetch, token);
+      favorited = ids.includes(id);
+    } catch {
+      favorited = false;
+    }
   }
   // recommendations are additive: if they fail, the detail page still renders
   let related: Movie[] = [];

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { listMovies, getMovie, getRelated, getComments, postComment, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
+import { listMovies, getMovie, getRelated, getCast, getComments, postComment, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -129,5 +129,15 @@ describe('comments client', () => {
   it('postComment maps 401 to a sign-in error', async () => {
     const fetch = vi.fn().mockResolvedValue(jsonResponse({ detail: 'missing bearer token' }, 401));
     await expect(postComment(fetch, 5, 'x', 'bad')).rejects.toMatchObject({ status: 401 });
+  });
+});
+
+describe('getCast', () => {
+  it('returns the cast names', async () => {
+    const payload = { items: ['Donnie Yen', 'Jet Li'] };
+    const fetch = vi.fn().mockResolvedValue(jsonResponse(payload));
+    const result = await getCast(fetch, 6419);
+    expect(result).toEqual(payload);
+    expect(fetch.mock.calls[0][0]).toContain('/movies/6419/cast');
   });
 });

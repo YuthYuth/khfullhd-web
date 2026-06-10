@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
-import { getComments, getMovie, getRelated, listFavoriteIds, postComment, addFavorite, removeFavorite } from '$lib/server/api';
+import { getCast, getComments, getMovie, getRelated, listFavoriteIds, postComment, addFavorite, removeFavorite } from '$lib/server/api';
 import type { CommentItem, Movie } from '$lib/types';
 import { getAccessToken } from '$lib/server/session';
 
@@ -42,7 +42,13 @@ export const load: PageServerLoad = async (event) => {
   } catch {
     comments = [];
   }
-  return { movie, signedIn: !!session?.user, favorited, related, comments };
+  let cast: string[] = [];
+  try {
+    cast = (await getCast(event.fetch, id)).items;
+  } catch {
+    cast = [];
+  }
+  return { movie, signedIn: !!session?.user, favorited, related, comments, cast };
 };
 
 export const actions: Actions = {

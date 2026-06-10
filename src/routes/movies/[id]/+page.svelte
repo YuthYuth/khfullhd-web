@@ -51,6 +51,12 @@
         </div>
       {/if}
 
+      {#if data.cast.length}
+        <p class="mt-4 max-w-2xl text-sm text-muted">
+          <span class="font-semibold text-text">Cast:</span> {data.cast.join(', ')}
+        </p>
+      {/if}
+
       {#if m.description}<p class="mt-6 max-w-2xl leading-relaxed text-text/90">{m.description}</p>{/if}
 
       {#if m.url}

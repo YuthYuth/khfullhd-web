@@ -48,6 +48,10 @@ export function getRelated(fetch: Fetcher, id: number, limit = 12, token?: strin
   return getJson<RelatedOut>(fetch, `/movies/${id}/related?${qs}`, token);
 }
 
+export function getCast(fetch: Fetcher, id: number, token?: string): Promise<{ items: string[] }> {
+  return getJson<{ items: string[] }>(fetch, `/movies/${id}/cast`, token);
+}
+
 export function getComments(fetch: Fetcher, id: number, limit = 50, token?: string): Promise<CommentsOut> {
   const qs = new URLSearchParams({ limit: String(limit) });
   return getJson<CommentsOut>(fetch, `/movies/${id}/comments?${qs}`, token);

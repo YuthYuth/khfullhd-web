@@ -3,6 +3,7 @@
   import { signIn, signOut } from '@auth/sveltekit/client';
   import { userLabel, type SessionUser } from '$lib/user';
   import MobileDrawer from './MobileDrawer.svelte';
+  import SearchSuggest from './SearchSuggest.svelte';
 
   let { user = null }: { user?: SessionUser | null } = $props();
   const label = $derived(userLabel(user));
@@ -18,16 +19,12 @@
 
     <!-- Desktop nav (unchanged at sm+) -->
     <a href="/movies" class="hidden text-sm text-muted hover:text-text sm:inline">Browse</a>
-    <form action="/search" class="ml-auto hidden sm:block">
-      <input
-        name="q"
-        value={query}
-        placeholder="Search movies & series…"
-        minlength="2"
-        class="w-44 rounded-full bg-surface-2 px-4 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent sm:w-64"
+    <div class="ml-auto hidden sm:block">
+      <SearchSuggest
+        initial={query}
+        inputClass="w-44 rounded-full bg-surface-2 px-4 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent sm:w-64"
       />
-      <button type="submit" class="sr-only">Search</button>
-    </form>
+    </div>
     <div class="hidden items-center gap-3 sm:flex">
       {#if label}
         <a href="/favorites" class="text-sm text-muted hover:text-text">Favorites</a>
@@ -63,18 +60,14 @@
 
   <!-- Mobile tap-to-reveal search -->
   {#if searchOpen}
-    <form action="/search" class="border-t border-surface-2 px-4 py-3 sm:hidden">
-      <!-- svelte-ignore a11y_autofocus -->
-      <input
-        name="q"
-        value={query}
+    <div class="border-t border-surface-2 px-4 py-3 sm:hidden">
+      <SearchSuggest
+        initial={query}
         autofocus
-        placeholder="Search movies & series…"
-        minlength="2"
-        class="min-h-11 w-full rounded-full bg-surface-2 px-4 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+        onnavigate={() => (searchOpen = false)}
+        inputClass="min-h-11 w-full rounded-full bg-surface-2 px-4 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
       />
-      <button type="submit" class="sr-only">Search</button>
-    </form>
+    </div>
   {/if}
 </header>
 

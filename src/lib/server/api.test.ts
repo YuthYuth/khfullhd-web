@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { listMovies, getMovie, getRelated, getCast, getComments, postComment, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
+import { listMovies, getMovie, getRelated, getCast, getComments, getSuggestions, postComment, searchMovies, listFavorites, listFavoriteIds, addFavorite, removeFavorite } from './api';
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -139,5 +139,17 @@ describe('getCast', () => {
     const result = await getCast(fetch, 6419);
     expect(result).toEqual(payload);
     expect(fetch.mock.calls[0][0]).toContain('/movies/6419/cast');
+  });
+});
+
+describe('getSuggestions', () => {
+  it('requires a token and returns ranked items', async () => {
+    const payload = { items: [{ movie_id: 2, title: 'The Flash' }] };
+    const fetch = vi.fn().mockResolvedValue(jsonResponse(payload));
+    const result = await getSuggestions(fetch, 'tok-1', 12);
+    expect(result).toEqual(payload);
+    const [url, init] = fetch.mock.calls[0];
+    expect(url).toContain('/suggestions');
+    expect(init.headers.Authorization).toBe('Bearer tok-1');
   });
 });

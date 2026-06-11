@@ -14,5 +14,8 @@
   </a>
 </section>
 
+{#if data.suggested.length}
+  <PosterRow title="Suggested for you" movies={data.suggested} />
+{/if}
 <PosterRow title="Top rated" movies={data.topRated} />
 <PosterRow title="Newest" movies={data.newest} />
